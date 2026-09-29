@@ -1,0 +1,303 @@
+/* ==========================================================================
+   Editorial Portfolio Responsive Stylesheet
+   Target: Truptimayee Padhi | Market Research & Analytics Consultant
+   File: css/responsive.css
+   ========================================================================== */
+
+/* --- Medium-Large Screens (max-width: 1024px) --- */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1.8rem;
+    }
+    
+    .brand-name {
+        font-size: 1.15rem;
+    }
+    
+    .brand-title {
+        font-size: 0.65rem;
+    }
+}
+
+/* --- Medium Screens & Tablets (max-width: 992px) --- */
+@media (max-width: 992px) {
+    .hero-grid,
+    .about-editorial-grid,
+    .case-study-featured,
+    .contact-editorial-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .editorial-meta-bar {
+        gap: 1.5rem;
+    }
+
+    .hero-display-title {
+        font-size: 3.2rem;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .expertise-table .table-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1.8rem 0;
+    }
+
+    .col-num {
+        font-size: 1.2rem;
+    }
+
+    .case-study-pair {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .card-compact-row {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+
+    .card-compact-thumb {
+        height: 210px;
+    }
+
+    .expand-toggle-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .drawer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+    }
+
+    .contact-editorial-grid {
+        padding: 2.5rem 1.8rem;
+    }
+
+    .page-banner-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* --- Small Tablets & Mobile Devices (max-width: 768px) --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .header-container {
+        height: 74px;
+        padding: 0;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 74px;
+        left: 0;
+        width: 100%;
+        background: var(--bg-paper);
+        border-bottom: 2px solid var(--border-line);
+        padding: 28px 24px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+        display: none;
+    }
+
+    .nav-menu.active {
+        display: block;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .nav-link {
+        font-size: 1.05rem;
+        padding: 4px 0;
+    }
+
+    .mobile-toggle {
+        display: flex;
+    }
+
+    .header-cta {
+        gap: 12px;
+        padding-left: 0;
+    }
+
+    .hero-section {
+        padding: 40px 0 60px 0;
+    }
+
+    .hero-display-title {
+        font-size: 2.5rem;
+        letter-spacing: -1px;
+    }
+
+    .hero-lead {
+        font-size: 1.05rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .hero-portrait {
+        height: 320px;
+    }
+
+    .metric-num {
+        font-size: 2.4rem;
+    }
+
+    .metric-label {
+        font-size: 0.75rem;
+    }
+
+    .editorial-headline {
+        font-size: 1.8rem;
+    }
+
+    .contact-headline {
+        font-size: 1.8rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        gap: 4px;
+        padding: 12px 0;
+    }
+
+    .footer-flex {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* --- Extra Small Screens (max-width: 480px) --- */
+@media (max-width: 480px) {
+    .hero-display-title {
+        font-size: 2.1rem;
+    }
+
+    .btn-editorial-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-editorial-sm {
+        display: none;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .filter-pills-editorial {
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .case-study-featured {
+        padding: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .cta-banner-title {
+        font-size: 1.8rem;
+    }
+
+    .editorial-image-card {
+        border-radius: 140px 140px 12px 12px;
+        padding-top: 2rem;
+    }
+}
+
+/* --- Splash Screen Cover Responsive Adjustments --- */
+@media (max-width: 1400px) {
+    .splash-text-anim {
+        font-size: 9.5rem;
+    }
+    .splash-title-line {
+        height: 140px;
+    }
+    .splash-image-frame {
+        height: 580px;
+        max-width: 500px;
+        margin-left: -30px;
+    }
+}
+
+@media (max-width: 992px) {
+    .splash-container {
+        padding: 30px 24px;
+    }
+
+    .splash-content-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .splash-text-anim {
+        font-size: 5.5rem;
+    }
+
+    .splash-title-line {
+        height: 85px;
+    }
+
+    .splash-image-frame {
+        max-width: 100%;
+        height: 380px;
+        margin-left: 0;
+    }
+
+    .splash-brand-badge {
+        right: 10px;
+        bottom: -15px;
+        width: 80px;
+        height: 80px;
+    }
+    
+    .badge-monogram {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .splash-text-anim {
+        font-size: 3.8rem;
+    }
+
+    .splash-title-line {
+        height: 60px;
+    }
+
+    .splash-bio-text {
+        font-size: 0.92rem;
+    }
+
+    .splash-image-frame {
+        height: 300px;
+        border-radius: 120px 120px 0 0;
+    }
+
+    .splash-progress-track {
+        width: 100px;
+    }
+}
