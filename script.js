@@ -5,15 +5,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const navMenu = document.querySelector('.nav-menu');
 
     if (mobileToggle && navMenu) {
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
+        mobileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = navMenu.classList.toggle('active');
+            mobileToggle.classList.toggle('active', isOpen);
+            mobileToggle.setAttribute('aria-expanded', isOpen);
         });
 
         // Close menu on link click
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                mobileToggle.setAttribute('aria-expanded', 'false');
             });
+        });
+
+        // Close menu if clicked outside
+        document.addEventListener('click', (e) => {
+            if (navMenu.classList.contains('active') && !navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                mobileToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 
@@ -24,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (splashCover) {
         let progress = 0;
-        const duration = 3000; // 4.5s balanced display time
+        const duration = 3000; // 3s balanced display time
         const intervalTime = 30;
         const increment = (intervalTime / duration) * 100;
 
@@ -55,6 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Tap or click anywhere on the splash cover to dismiss immediately
+        splashCover.addEventListener('click', () => {
+            clearInterval(progressTimer);
+            dismissSplash();
+        });
+
         // Also allow wheel scroll or keypress to immediately slide up
         window.addEventListener('wheel', () => {
             clearInterval(progressTimer);
@@ -82,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cardCat = card.getAttribute('data-category');
                 if (filter === 'all' || cardCat === filter) {
                     card.style.display = 'block';
+                    card.classList.add('is-revealed');
                 } else {
                     card.style.display = 'none';
                 }
@@ -169,82 +190,281 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    if (contactForm) {
-        contactForm.addEventListener('submit', async function (e) {
+    // --- Direct Email Mailbox Compose Handler ---
+    const composeEmailLinks = document.querySelectorAll('.email-compose-link, #direct-email-link');
+    composeEmailLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
             e.preventDefault();
 
-            const submitBtn = contactForm.querySelector('.btn-editorial-submit');
-            const originalHTML = submitBtn.innerHTML;
+            const recipient = 'truptymaipadhy@gmail.com';
+            const subject = encodeURIComponent('Consulting & Research Inquiry — Truptimayee Padhi');
+            const body = encodeURIComponent('Receiver (To): truptymaipadhy@gmail.com\nSender (From): \n\nHello Truptimayee,\n\nI would like to discuss a project regarding:\n- Scope:\n- Timeline:\n- Contact Details:\n');
 
-            submitBtn.innerHTML = 'Sending Message... <i class="fas fa-spinner fa-spin"></i>';
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${subject}&body=${body}`;
+            const mailtoUrl = `mailto:${recipient}?subject=${subject}&body=${body}`;
+
+            // Synchronously open Gmail compose window in a new tab (never blocked by popup blockers)
+            const win = window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+
+            // If popup was blocked or browser prefers mailto client, invoke system mail app
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+                window.location.href = mailtoUrl;
+            }
+        });
+    });
+
+    // --- Web3Forms Contact Form Submission Handler ---
+if (contactForm) {
+
+    contactForm.addEventListener('submit', async function (e) {
+
+        e.preventDefault();
+
+        const submitBtn = contactForm.querySelector('.btn-editorial-submit');
+
+        const originalHTML = submitBtn
+            ? submitBtn.innerHTML
+            : 'Send Message';
+
+        // Disable button while sending
+        if (submitBtn) {
+            submitBtn.innerHTML =
+                'Sending Message... <i class="fas fa-spinner fa-spin"></i>';
+
             submitBtn.disabled = true;
+        }
 
-            const formData = new FormData(contactForm);
-            const formObject = Object.fromEntries(formData);
-            const jsonPayload = JSON.stringify(formObject);
+        // Collect form data
+        const formData = new FormData(contactForm);
 
-            try {
-                const response = await fetch('https://api.web3forms.com/submit', {
+        try {
+
+            const response = await fetch(
+                'https://api.web3forms.com/submit',
+                {
                     method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
-                    },
-                    body: jsonPayload
-                });
+                    }
+                }
+            );
 
-                const result = await response.json();
+            const result = await response.json();
 
-                if (result.success) {
-                    submitBtn.innerHTML = 'Message Delivered <i class="fas fa-check"></i>';
+            console.log('Web3Forms response:', result);
+
+            if (response.ok && result.success) {
+
+                // Show successful state
+                if (submitBtn) {
+                    submitBtn.innerHTML =
+                        'Message Delivered <i class="fas fa-check"></i>';
+
                     submitBtn.style.backgroundColor = '#2d6a4f';
-                    contactForm.reset();
-                    openSuccessModal();
-                } else {
-                    console.error('Web3Forms API error:', result);
-                    submitBtn.innerHTML = (result.message || 'Submission Error') + ' <i class="fas fa-exclamation-circle"></i>';
+                }
+
+                // Clear form
+                contactForm.reset();
+
+                // Open your existing success modal
+                openSuccessModal();
+
+            } else {
+
+                console.error(
+                    'Web3Forms submission failed:',
+                    result
+                );
+
+                if (submitBtn) {
+                    submitBtn.innerHTML =
+                        'Submission Failed <i class="fas fa-exclamation-circle"></i>';
+
                     submitBtn.style.backgroundColor = '#b7094c';
                 }
-            } catch (error) {
-                console.error('Contact Form Fetch/CORS error:', error);
-                if (window.location.protocol === 'file:') {
-                    submitBtn.innerHTML = 'file:/// blocks API (Use localhost/live server) <i class="fas fa-info-circle"></i>';
-                } else {
-                    submitBtn.innerHTML = 'Network Error. Try Again';
-                }
+
+                alert(
+                    result.message ||
+                    'Unable to send your message. Please try again.'
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                'Web3Forms network error:',
+                error
+            );
+
+            if (submitBtn) {
+                submitBtn.innerHTML =
+                    'Try Again <i class="fas fa-exclamation-circle"></i>';
+
                 submitBtn.style.backgroundColor = '#b7094c';
             }
 
-            setTimeout(() => {
-                submitBtn.innerHTML = originalHTML;
-                submitBtn.disabled = false;
-                submitBtn.style.backgroundColor = '';
-            }, 4500);
-        });
-    }
+            alert(
+                'Unable to connect to the email service. Please try again.'
+            );
 
-    // --- 4. Sequential Experience Timeline Scroll Observer ---
-    const expItems = document.querySelectorAll('.experience-item');
-    if (expItems.length > 0) {
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -40px 0px'
+        } finally {
+
+            // Restore button after 4.5 seconds
+            setTimeout(() => {
+
+                if (submitBtn) {
+
+                    submitBtn.innerHTML = originalHTML;
+
+                    submitBtn.disabled = false;
+
+                    submitBtn.style.backgroundColor = '';
+                }
+
+            }, 4500);
+        }
+
+    });
+
+}
+
+    // --- 4. Dynamic Animated Key Metrics Counter ---
+    const tickerSection = document.querySelector('.ticker-section');
+    const metricNums = document.querySelectorAll('.metric-num');
+
+    if (metricNums.length > 0) {
+        let hasAnimated = false;
+
+        const animateCounters = () => {
+            if (hasAnimated) return;
+            hasAnimated = true;
+
+            metricNums.forEach(numEl => {
+                const target = parseInt(numEl.getAttribute('data-target'), 10);
+                if (isNaN(target)) return;
+
+                const suffix = numEl.getAttribute('data-suffix') || '';
+                const prefix = numEl.getAttribute('data-prefix') || '';
+                const padLength = parseInt(numEl.getAttribute('data-pad'), 10) || 0;
+                const duration = 2000; // 2 seconds smooth counting
+                const startTime = performance.now();
+
+                const formatValue = (val) => {
+                    let str = String(val);
+                    if (padLength > 0) {
+                        str = str.padStart(padLength, '0');
+                    }
+                    return `${prefix}${str}${suffix}`;
+                };
+
+                // Start from 0 (or 00)
+                numEl.textContent = formatValue(0);
+                const parentBlock = numEl.closest('.metric-block');
+                if (parentBlock) {
+                    parentBlock.classList.add('counter-active');
+                }
+
+                const updateCounter = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Smooth easeOutCubic curve for realistic decelerating odometer feel
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const currentVal = Math.round(easeOut * target);
+
+                    numEl.textContent = formatValue(currentVal);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        numEl.textContent = formatValue(target);
+                    }
+                };
+
+                requestAnimationFrame(updateCounter);
+            });
         };
 
-        const expObserver = new IntersectionObserver((entries, observer) => {
+        const triggerTarget = tickerSection || metricNums[0];
+        if (triggerTarget) {
+            const counterObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        // Check if editorial splash cover is still active
+                        const splash = document.getElementById('splash-cover');
+                        if (splash && !splash.classList.contains('splash-dismissed') && getComputedStyle(splash).display !== 'none') {
+                            const checkSplashInterval = setInterval(() => {
+                                if (!splash || splash.classList.contains('splash-dismissed') || getComputedStyle(splash).display === 'none') {
+                                    clearInterval(checkSplashInterval);
+                                    animateCounters();
+                                }
+                            }, 100);
+                        } else {
+                            animateCounters();
+                        }
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            counterObserver.observe(triggerTarget);
+        }
+    }
+
+    // --- 5. Sequential Experience Timeline Scroll Observer ---
+    const expTimeline = document.querySelector('.experience-timeline');
+    const expItems = document.querySelectorAll('.experience-item');
+
+    if (expTimeline || expItems.length > 0) {
+        const timelineObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animated');
+                    if (entry.target.classList.contains('experience-timeline')) {
+                        entry.target.classList.add('timeline-active');
+                    }
+                    if (entry.target.classList.contains('experience-item')) {
+                        entry.target.classList.add('animated');
+                    }
+                    observer.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -40px 0px'
+        });
 
+        if (expTimeline) {
+            timelineObserver.observe(expTimeline);
+        }
         expItems.forEach(item => {
-            expObserver.observe(item);
+            timelineObserver.observe(item);
         });
     }
 
-    // --- 5. Smooth Scroll to Top ---
+    // --- 6. Universal Editorial Scroll Reveal Observer ---
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    if (revealElements.length > 0) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.08,
+            rootMargin: '0px 0px -30px 0px'
+        });
+
+        revealElements.forEach(el => {
+            revealObserver.observe(el);
+        });
+    }
+
+    // --- 7. Smooth Scroll to Top ---
     const backToTopLinks = document.querySelectorAll('.back-top-link');
     backToTopLinks.forEach(link => {
         link.addEventListener('click', (e) => {

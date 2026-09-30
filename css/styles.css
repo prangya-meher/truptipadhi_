@@ -280,14 +280,33 @@ h4 {
     border: none;
     cursor: pointer;
     flex-direction: column;
-    gap: 5px;
-    padding: 6px;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    z-index: 1001;
 }
 
 .mobile-toggle span {
+    display: block;
     width: 24px;
     height: 2px;
     background-color: var(--text-primary);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, opacity 0.2s ease;
+    transform-origin: center;
+}
+
+.mobile-toggle.active span:nth-child(1) {
+    transform: translateY(4px) rotate(45deg);
+    background-color: var(--accent-primary);
+}
+
+.mobile-toggle.active span:nth-child(2) {
+    transform: translateY(-4px) rotate(-45deg);
+    background-color: var(--accent-primary);
 }
 
 /* --- Hero Section --- */
@@ -493,8 +512,8 @@ h4 {
 }
 
 .metric-label {
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--text-body);
@@ -630,6 +649,22 @@ section {
     margin-top: 1.5rem;
 }
 
+.experience-timeline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -2.5px;
+    width: 2.5px;
+    height: 0%;
+    background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-sage) 60%, var(--accent-ochre) 100%);
+    transition: height 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 2px;
+}
+
+.experience-timeline.timeline-active::after {
+    height: 100%;
+}
+
 .experience-item {
     position: relative;
     opacity: 0;
@@ -664,6 +699,20 @@ section {
     justify-content: center;
     box-shadow: 0 4px 12px rgba(200, 90, 50, 0.3);
     border: 3px solid var(--bg-paper);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.5s ease;
+}
+
+.experience-item.animated .experience-node {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(200, 90, 50, 0.2), 0 6px 16px rgba(200, 90, 50, 0.35);
+}
+
+.experience-item:nth-child(2).animated .experience-node {
+    box-shadow: 0 0 0 6px rgba(46, 90, 68, 0.2), 0 6px 16px rgba(46, 90, 68, 0.35);
+}
+
+.experience-item:nth-child(3).animated .experience-node {
+    box-shadow: 0 0 0 6px rgba(212, 140, 43, 0.2), 0 6px 16px rgba(212, 140, 43, 0.35);
 }
 
 .experience-item:nth-child(2) .experience-node {
@@ -800,12 +849,13 @@ section {
     grid-template-columns: 60px 2.2fr 3fr 2fr;
     gap: 2rem;
     align-items: center;
-    padding: 2.2rem 1.2rem;
+    padding: 2.2rem 2.2rem;
     border-bottom: 1px solid var(--border-line);
     background: var(--bg-surface);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     box-shadow: var(--shadow-card);
     transition: var(--transition);
+    box-sizing: border-box;
 }
 
 .table-row:nth-child(1) {
@@ -937,6 +987,9 @@ section {
     border-top: 5px solid var(--accent-primary);
     padding: 3.5rem;
     box-shadow: 0 16px 40px rgba(40, 33, 27, 0.3);
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .case-study-featured h3,
@@ -944,11 +997,25 @@ section {
     color: var(--text-on-dark);
 }
 
+.case-study-img {
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
 .case-study-img img {
     width: 100%;
     height: 340px;
     object-fit: cover;
+    display: block;
     border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.case-study-info {
+    min-width: 0;
+    width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .case-meta {
@@ -960,6 +1027,9 @@ section {
     margin-bottom: 0.8rem;
     background: rgba(212, 140, 43, 0.15);
     padding: 4px 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .case-title {
@@ -969,6 +1039,9 @@ section {
     letter-spacing: 0.5px;
     margin-bottom: 1rem;
     color: var(--text-on-dark);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .case-summary {
@@ -976,6 +1049,8 @@ section {
     opacity: 0.9;
     margin-bottom: 1.8rem;
     line-height: 1.7;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .case-tech-list {
@@ -992,6 +1067,13 @@ section {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: var(--text-on-dark);
+}
+
+.case-study-actions {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .case-study-featured .btn-editorial-link {
@@ -1434,12 +1516,14 @@ section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    width: 100%;
 }
 
 .field-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
 }
 
 .field-group label {
@@ -1451,11 +1535,16 @@ section {
 }
 
 .field-group input,
-.field-group textarea {
-    padding: 14px 16px;
+.field-group textarea,
+.editorial-form input[type="text"],
+.editorial-form input[type="email"],
+.editorial-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
     background: var(--bg-paper);
     border: 1.5px solid var(--border-line);
-    border-radius: 0px;
+    border-radius: 4px;
     font-family: var(--font-sans);
     font-size: 0.95rem;
     color: var(--text-primary);
@@ -1463,13 +1552,33 @@ section {
     transition: var(--transition);
 }
 
+.field-group input::placeholder,
+.field-group textarea::placeholder,
+.editorial-form input::placeholder,
+.editorial-form textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.75;
+}
+
 .field-group input:focus,
-.field-group textarea:focus {
+.field-group textarea:focus,
+.editorial-form input[type="text"]:focus,
+.editorial-form input[type="email"]:focus,
+.editorial-form textarea:focus {
     border-color: var(--accent-primary);
     background: var(--bg-surface);
+    box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.12);
+}
+
+.field-group textarea,
+.editorial-form textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
 }
 
 .btn-editorial-submit {
+    width: 100%;
     padding: 16px 32px;
     background-color: var(--accent-primary);
     color: #FFFFFF;
@@ -1482,8 +1591,9 @@ section {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    border-radius: 0px;
+    border-radius: 4px;
     box-shadow: 0 4px 14px rgba(200, 90, 50, 0.25);
+    letter-spacing: 0.5px;
 }
 
 .btn-editorial-submit:hover {
@@ -1773,7 +1883,7 @@ section {
 /* Footer / Progress Bar */
 .splash-footer-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     padding-top: 24px;
     margin-top: 15px;
@@ -2012,4 +2122,57 @@ section {
     font-size: 0.95rem;
     border-radius: 4px;
     cursor: pointer;
+}
+
+/* ==========================================================================
+   Editorial Scroll & Reveal Dynamic Animation Engine
+   ========================================================================== */
+
+/* Universal Scroll Reveal */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered Delays for Sequential Grid & List Entries */
+.reveal-stagger-1 { transition-delay: 0.08s; }
+.reveal-stagger-2 { transition-delay: 0.18s; }
+.reveal-stagger-3 { transition-delay: 0.28s; }
+.reveal-stagger-4 { transition-delay: 0.38s; }
+
+/* Dynamic Metrics Number Counter Polish */
+.metric-num {
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.metric-block.counter-active .metric-num {
+    animation: metricPop 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes metricPop {
+    0% { transform: scale(0.92); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Accessibility: Safe fallback for users requesting reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll,
+    .experience-item,
+    .experience-timeline::after {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+        height: 100% !important;
+    }
 }
